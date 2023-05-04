@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#2196f3">
+    <title>{{ .title }}</title>
+    <link href="https://cdn.bootcdn.net/ajax/libs/framework7/5.7.9/css/framework7.bundle.css" rel="stylesheet">
+</head>
+<body>
+<div id="app">
+    <div class="view view-main">
+        <div data-name="home" class="page">
+
+            <div class="navbar">
+                <div class="navbar-bg"></div>
+                <div class="navbar-inner">
+                    <div class="title">{{ .title }}</div>
+                </div>
+            </div>
+
+            <!-- Scrollable page content -->
+            <div class="page-content">
+                <div class="block-title">支持平台</div>
+                <div class="block block-strong">
+                    <div class="chip">
+                        <div class="chip-label">抖音</div>
+                    </div>
+                    <div class="chip">
+                        <div class="chip-label">皮皮虾</div>
+                    </div>
+                    <div class="chip">
+                        <div class="chip-label">火山</div>
+                    </div>
+                    <div class="chip">
+                        <div class="chip-label">微视</div>
+                    </div>
+                    <div class="chip">
+                        <div class="chip-label">最右</div>
+                    </div>
+                    <div class="chip">
+                        <div class="chip-label">快手</div>
+                    </div>
+                    <div class="chip">
+                        <div class="chip-label">全民小视频</div>
+                    </div>
+                    <div class="chip">
+                        <div class="chip-label">皮皮搞笑</div>
+                    </div>
+                    <div class="chip">
+                        <div class="chip-label">梨视频</div>
+                    </div>
+                    <div class="chip">
+                        <div class="chip-label">西瓜</div>
+                    </div>
+                    <div class="chip">
+                        <div class="chip-label">微博</div>
+                    </div>
+                    <div class="chip">
+                        <div class="chip-label">虎牙</div>
+                    </div>
+                    <div class="chip">
+                        <div class="chip-label">绿洲</div>
+                    </div>
+                    <div class="chip">
+                        <div class="chip-label">好看</div>
+                    </div>
+                    <div class="chip">
+                        <div class="chip-label">逗拍</div>
+                    </div>
+                    <div class="chip">
+                        <div class="chip-label">美拍</div>
+                    </div>
+                    <div class="chip">
+                        <div class="chip-label">新片场</div>
+                    </div>
+                    <div class="chip">
+                        <div class="chip-label">A站</div>
+                    </div>
+                    <div class="chip">
+                        <div class="chip-label">全民K歌</div>
+                    </div>
+                    <div class="chip">
+                        <div class="chip-label">6间房</div>
+                    </div>
+                </div>
+                <div class="list no-hairlines-md">
+                    <ul>
+                        <li class="item-content item-input item-input-with-info">
+                            <div class="item-inner">
+                                <div class="item-input-wrap">
+                                    <input type="text" placeholder="粘贴在这里" id="video-url" value="" required/>
+                                    <span class="input-clear-button"></span>
+                                    <div class="item-input-info">请粘贴视频分享的内容</div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="block">
+                    <button class="col button button-large button-raised button-fill" id="video-parse" onclick="onClickVideoParse()">解析</button>
+                </div>
+            </div>
+
+            <div class="popup popup-swipe-to-close-handler" id="popup-success">
+                <div class="block page-content">
+                    <p class="segmented segmented-raised">
+                        <a href="#" class="button" id="copy-title" onclick="onClickCopyTitle()">标题</a>
+                        <a href="#" class="button" id="copy-url" onclick="onClickCopyUrl()">地址</a>
+                        <a href="#" class="button" id="copy-all" onclick="onClickCopyAll()">全部</a>
+                        <a href="#" class="button" id="close-popup" onclick="onClickClosePopup()">关闭</a>
+                    </p>
+                    <div class="title" id="video-title">标题</div>
+                    <div class="text-align-center">
+                        <img id="video-cover"/>
+                    </div>
+                    <input type="hidden" placeholder="" id="video-raw-url" value="" readonly/>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.bootcdn.net/ajax/libs/framework7/5.7.9/js/framework7.bundle.min.js"></script>
+<script>
+    const app = new Framework7({
+        root: '#app',
+        name: '{{ .title }}'
+    });
+
+    function copyText(text) {
+        const input = document.createElement('textarea');
+        input.value = text;
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand('copy');
+        document.body.removeChild(input);
+    }
+
+    function showToast(text) {
+        app.toast.create({
+            text: text,
+            position: 'bottom',
+            closeTimeout: 2000,
+        }).open();
+    }
+
+    function onClickVideoParse() {
+        const videoUrl = document.getElementById('video-url').value;
+        if (videoUrl === '') {
+            app.dialog.alert('请输入视频地址');
+            return;
+        }
+
+        app.dialog.preloader('解析中...');
+        const request = '/video/share/url/parse?url=' + encodeURIComponent(videoUrl);
+        fetch(request)
+            .then(response => response.json())
+            .then(data => {
+                app.dialog.close();
+                if (data.code === 200) {
+                    app.popup.open('#popup-success');
+                    document.getElementById('video-title').innerText = data.data.title;
+                    document.getElementById('video-cover').src = data.data.cover_url;
+                    document.getElementById('video-raw-url').value = data.data.video_url;
+                } else {
+                    app.dialog.alert(data.msg);
+                }
+            })
+            .catch(error => {
+                app.dialog.close();
+                app.dialog.alert(error);
+            });
+    }
+
+    function onClickCopyTitle() {
+        const title = document.getElementById('video-title').innerText;
+        copyText(title);
+        showToast('标题已复制');
+    }
+
+    function onClickCopyUrl() {
+        const url = document.getElementById('video-raw-url').value;
+        copyText(url);
+        showToast('地址已复制');
+    }
+
+    function onClickCopyAll() {
+        const title = document.getElementById('video-title').innerText;
+        const url = document.getElementById('video-raw-url').value;
+        copyText(title + "\n" + url);
+        showToast('标题和地址已复制');
+    }
+
+    function onClickClosePopup() {
+        app.popup.close('#popup-success');
+    }
+
+</script>
+
+</body>
+</html>
