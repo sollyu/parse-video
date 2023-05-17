@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/patrickmn/go-cache"
 	"log"
 	"net/http"
 	"os"
@@ -22,10 +23,11 @@ type HttpResponse struct {
 
 func main() {
 	r := gin.Default()
+	k := cache.New(time.Hour, 2*time.Hour)
 
 	r.LoadHTMLGlob("templates/*")
 	r.GET("/", func(c *gin.Context) {
-		c.HTML(200, "index.tmpl", gin.H{
+		c.HTML(200, "framework7.html", gin.H{
 			"title": os.Getenv("APP_NAME"),
 		})
 	})
@@ -34,6 +36,12 @@ func main() {
 		urlReg := regexp.MustCompile(`http[s]?:\/\/[\w.-]+[\w\/-]*[\w.-]*\??[\w=&:\-\+\%]*[/]*`)
 		videoShareUrl := urlReg.FindString(c.Query("url"))
 		//fmt.Println("123", videoShareUrl, c.Query("url"))
+
+		// 从缓存中获取
+		if res, ok := k.Get(videoShareUrl); ok {
+			c.JSON(http.StatusOK, res)
+			return
+		}
 
 		parseRes, err := parser.ParseVideoShareUrl(videoShareUrl)
 		jsonRes := HttpResponse{
@@ -49,6 +57,7 @@ func main() {
 		}
 
 		c.JSON(http.StatusOK, jsonRes)
+		k.Set(videoShareUrl, jsonRes, cache.DefaultExpiration)
 	})
 
 	r.GET("/video/id/parse", func(c *gin.Context) {
