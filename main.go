@@ -44,6 +44,8 @@ func main() {
 		}
 
 		parseRes, err := parser.ParseVideoShareUrl(videoShareUrl)
+		parseRes.ShortUrl = parser.ShortUrl(parseRes.VideoUrl, parseRes.Title)
+
 		jsonRes := HttpResponse{
 			Code: 200,
 			Msg:  "解析成功",

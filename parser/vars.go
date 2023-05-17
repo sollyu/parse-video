@@ -56,6 +56,7 @@ type VideoParseInfo struct {
 	VideoUrl string `json:"video_url"` // 视频播放地址
 	MusicUrl string `json:"music_url"` // 音乐播放地址
 	CoverUrl string `json:"cover_url"` // 视频封面地址
+	ShortUrl string `json:"short_url"` // 短链接
 }
 
 // BatchParseItem 批量解析时, 单条解析格式

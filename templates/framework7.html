@@ -162,7 +162,7 @@
                     app.popup.open('#popup-success');
                     document.getElementById('video-title').innerText = data.data.title;
                     document.getElementById('video-cover').src = data.data.cover_url;
-                    document.getElementById('video-raw-url').value = data.data.video_url;
+                    document.getElementById('video-raw-url').value = data.data.short_url;
                 } else {
                     app.dialog.alert(data.msg);
                 }
