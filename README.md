@@ -41,6 +41,35 @@ Golang短视频去水印, 视频目前支持20个平台, 图集目前支持2个�
 | 抖音 | ✔  |
 | 快手 | ✔  | 
 
+## 转载后增加功能
+
+1. 支持Arm平台
+2. 复制视频地址
+3. 地址短链接
+4. 自定义标题
+5. 缓存视频地址
+
+```shell
+docker run \
+  --detach \
+  --name=VideoParse \
+  --restart unless-stopped \
+  --publish 8278:8080 \
+  --env TZ="Asia/Shanghai" \
+  --env APP_NAME="视频解析" \
+  --env YOURLS_URL="https://xxxxxx.com" \
+  --env YOURLS_SIGNATURE="xxxxxxxxxxxxxxx" \
+  --memory 128M \
+  --cpus 0.3 \
+  --log-driver json-file \
+  --log-opt max-size=100m \
+  1fe2be14/parse-video:latest
+```
+
+> Docker镜像地址：https://hub.docker.com/r/1fe2be14/parse-video
+> 
+> Yourls服务器信息可不配置，不配置则不会生成短链接
+
 # 安装
 ```go
 // 根据分享链接解析
@@ -109,3 +138,4 @@ go get github.com/go-resty/resty/v2
 go get github.com/tidwall/gjson
 go get github.com/PuerkitoBio/goquery
 ```
+
