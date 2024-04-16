@@ -54,7 +54,7 @@ func main() {
 		if err != nil {
 			jsonRes = HttpResponse{
 				Code: 201,
-				Msg:  "解析失败",
+				Msg:  err.Error(),
 			}
 		}
 
@@ -66,7 +66,7 @@ func main() {
 		videoId := c.Query("video_id")
 		source := c.Query("source")
 
-		parseRes, err := parser.ParseVideoId(videoId, source)
+		parseRes, err := parser.ParseVideoId(source, videoId)
 		jsonRes := HttpResponse{
 			Code: 200,
 			Msg:  "解析成功",
@@ -75,7 +75,7 @@ func main() {
 		if err != nil {
 			jsonRes = HttpResponse{
 				Code: 201,
-				Msg:  "解析失败",
+				Msg:  err.Error(),
 			}
 		}
 

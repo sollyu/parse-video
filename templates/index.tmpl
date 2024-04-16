@@ -103,20 +103,33 @@ function  setValue(){
     // 链接地址需要用encodeURIComponent加密, 否则会导致原视频链接中&后的字符被识别为本链接的参数而丢弃
     xmlhttp.open("GET", location.href + "/video/share/url/parse?url=" + encodeURIComponent(v),false);
     xmlhttp.send();
-    const jsonObj = JSON.parse(xmlhttp.responseText);
-    if(jsonObj.code === 200){
-        const image_thumbnail = jsonObj.data.cover_url;
-        const video_url = jsonObj.data.video_url;
-        const download_html = '<h4>'+jsonObj.data.title+' </h4>' +
-            `<a class="mdui-btn mdui-btn-raised" href="${image_thumbnail}" target="_blank" download="video">下载封面</a>` +
-            `<a class="mdui-btn mdui-btn-raised" href="${video_url}" target="_blank" download="video">下载视频</a>` +
-            `<input class="mdui-textfield-input" type="text" id="video_url" value="${video_url}" disabled hidden="hidden" />` +
-            `<a class="mdui-btn mdui-btn-raised" onclick="copy_video_url_to_clipboard()">复制地址</a>`
-        ;
-        $(".down").html(download_html) ;
+    var jsonObj = JSON.parse(xmlhttp.responseText);
+    console.log(jsonObj);
+    if(jsonObj.code == 200){
+        mdui.snackbar({
+            message: '解析成功'
+        });
+
+        let successHtml = '<h4>'+jsonObj.data.title+' </h4>';
+        successHtml += '<a class="mdui-btn mdui-btn-raised" href="'+jsonObj.data.cover_url+'" target="_blank" download="video">下载封面</a>';
+
+        // 如果video_url不为空, 则显示下载视频按钮
+        if(jsonObj.data.video_url != ""){
+            successHtml += '<a class="mdui-btn mdui-btn-raised" href="'+jsonObj.data.video_url+'" target="_blank" download="video">下载视频</a>';
+        }
+
+        // 如果 jsonObj.data.images 是数组， 并且长度大于0, 则img展示图片
+        if(jsonObj.data.images && jsonObj.data.images.length > 0){
+            successHtml += '<h4>图集</h4>';
+            jsonObj.data.images.forEach(function(item){
+                successHtml += '<img src="'+item+'" style="width: 160px; margin: 1em;"/>';
+            });
+        }
+
+        $(".down").html(successHtml);
     }else{
         mdui.snackbar({
-            message: '解析失败,视频不存在或者链接不正确'
+            message: "解析失败,视频不存在或者链接不正确:<br/>" + jsonObj.msg
         });
     }
 }
